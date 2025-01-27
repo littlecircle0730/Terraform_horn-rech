@@ -1,0 +1,3 @@
+project = "horn"
+stage   = "rech"
+region  = "us-west-2"

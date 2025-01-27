@@ -1,0 +1,15 @@
+project              = "project"
+stage                = "stage"
+region               = "us-east-1"
+azs                  = ["us-east-1a", "us-east-1b"]
+
+vpc_cidr             = "10.0.0.0/16"
+public_subnets_cidr  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnets_cidr = ["10.0.3.0/24", "10.0.4.0/24"]
+nat_cidr             = ["10.0.5.0/24", "10.0.6.0/24"]
+igw_cidr             = "10.0.8.0/24"
+
+domain_name          = "project-stage.example.com"
+
+bastion_backend_git        = "git@github.com:whole-communities-whole-health/Hornsense-backend.git"
+bastion_backend_git_branch = "main"

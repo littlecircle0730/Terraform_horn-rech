@@ -1,0 +1,14 @@
+{
+    "production": {
+        "project_name": "hornsense-backend",
+        "runtime": "python3.9",
+        "s3_bucket": "hornsense-backend-bucket",
+        "app_function": "hornsense.wsgi.application",
+        "exclude": ["cfnlint", ".zappa-env", "__pycache__"],
+        "slim_handler": true,
+        "environment_variables": {
+            "DJANGO_CONFIGURATION": "Development",
+            "LD_LIBRARY_PATH": "/tmp/hornsense-backend/bin/bin-lib"
+        }
+    }
+}

@@ -1,0 +1,4 @@
+bucket         = "project-stage-tfstate"
+region         = "us-east-1"
+dynamodb_table = "project-stage-lock"
+kms_key_id     = "alias/project-stage/tfstate"
