@@ -82,6 +82,20 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+resource "aws_iam_policy" "horn_rech_secrets_policy" {
+  name        = "horn-rech-secrets-access"
+  description = "Allow access to horn_rech secrets"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["secretsmanager:GetSecretValue"]
+      Resource = aws_secretsmanager_secret.horn_rech_db_secret.arn
+    }]
+  })
+}
+
 resource "aws_iam_policy" "bastion_policy" {
   name = "${local.project_stage}_bastion_policy"
   path = "/"
@@ -212,6 +226,16 @@ resource "aws_iam_policy" "bastion_policy" {
                 "logs:DescribeLogGroups"
             ],
             "Resource": "arn:aws:logs:${local.region}:${local.account_id}:log-group:*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+            "iam:AttachRolePolicy",
+            "iam:DetachRolePolicy",
+            "iam:ListAttachedRolePolicies",
+            "iam:GetRolePolicy"
+          ],
+          "Resource": "arn:aws:iam::${local.account_id}:role/${local.project_stage}_bastion_role"
         }
     ]
 }
@@ -227,6 +251,25 @@ resource "aws_iam_instance_profile" "bastion" {
   name = "${local.project_stage}_bastion_profile"
   role = aws_iam_role.bastion_role.name
 }
+
+resource "aws_secretsmanager_secret" "horn_rech_db_secret" {
+  name        = "rds-db-credentials/cluster-cet7j6na78oj.us-west-2/horn_rech"
+  description = "RDS database horn_rech credentials for horn-rech"
+}
+
+resource "aws_secretsmanager_secret_version" "horn_rech_db_secret_value" {
+  secret_id = aws_secretsmanager_secret.horn_rech_db_secret.id
+  secret_string = jsonencode({
+    dbInstanceIdentifier = "horn-rech",
+    engine = "aurora-mysql",
+    host = "horn-rech.cluster.cet7j6na78oj.us-west-2.rds.amazonaws.com",
+    port = 3306,
+    resourceId = "cluster-AHD5T2ZFMRBSCRISAPHMF53KNY",
+    username = "horn_rech",
+    password = "EbmY4ka4VroKXH0qvcAt"
+  })
+}
+
 
 resource "tls_private_key" "deployment" {
   algorithm   = "ECDSA"
