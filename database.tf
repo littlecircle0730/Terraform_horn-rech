@@ -87,7 +87,7 @@ resource "aws_rds_cluster" "primary" {
 
   database_name   = local.database_name
   master_username = local.master_username
-  # master_password = local.master_password
+  master_password = local.master_password
   # checkov:skip=CKV_AWS_128: Not supported by Aurora Serverless
   # iam_database_authentication_enabled = true
   deletion_protection = true

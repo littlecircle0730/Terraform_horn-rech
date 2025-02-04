@@ -82,17 +82,29 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_policy" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
+resource "aws_iam_role_policy_attachment" "horn_rech_secrets_attachment" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = aws_iam_policy.horn_rech_secrets_policy.arn
+}
+
 resource "aws_iam_policy" "horn_rech_secrets_policy" {
   name        = "horn-rech-secrets-access"
   description = "Allow access to horn_rech secrets"
 
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [{
-      Effect   = "Allow"
-      Action   = ["secretsmanager:GetSecretValue"]
-      Resource = aws_secretsmanager_secret.horn_rech_db_secret.arn
-    }]
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:PutSecretValue",
+          "secretsmanager:UpdateSecret",
+          "secretsmanager:ListSecrets"
+        ]
+        Resource = "arn:aws:secretsmanager:us-west-2:476402459683:secret:rds-db-credentials/cluster-cet7j6na78oj.us-west-2/horn_rech*"
+      }
+    ]
   })
 }
 
@@ -250,24 +262,6 @@ resource "aws_iam_role_policy_attachment" "bastion_policy" {
 resource "aws_iam_instance_profile" "bastion" {
   name = "${local.project_stage}_bastion_profile"
   role = aws_iam_role.bastion_role.name
-}
-
-resource "aws_secretsmanager_secret" "horn_rech_db_secret" {
-  name        = "rds-db-credentials/cluster-cet7j6na78oj.us-west-2/horn_rech"
-  description = "RDS database horn_rech credentials for horn-rech"
-}
-
-resource "aws_secretsmanager_secret_version" "horn_rech_db_secret_value" {
-  secret_id = aws_secretsmanager_secret.horn_rech_db_secret.id
-  secret_string = jsonencode({
-    dbInstanceIdentifier = "horn-rech",
-    engine = "aurora-mysql",
-    host = "horn-rech.cluster.cet7j6na78oj.us-west-2.rds.amazonaws.com",
-    port = 3306,
-    resourceId = "cluster-AHD5T2ZFMRBSCRISAPHMF53KNY",
-    username = "horn_rech",
-    password = "EbmY4ka4VroKXH0qvcAt"
-  })
 }
 
 

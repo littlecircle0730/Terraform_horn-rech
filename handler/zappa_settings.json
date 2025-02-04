@@ -1,7 +1,7 @@
 {
     "production": {
         "project_name": "hornsense-backend",
-        "runtime": "python3.9",
+        "runtime": "python3.10",
         "s3_bucket": "hornsense-backend-bucket",
         "app_function": "hornsense.wsgi.application",
         "exclude": ["cfnlint", ".zappa-env", "__pycache__"],
