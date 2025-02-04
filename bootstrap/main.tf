@@ -19,12 +19,19 @@ resource "aws_s3_bucket" "tfstate" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "tfstate" {
+  bucket = aws_s3_bucket.tfstate.id
+
+  rule {
+    object_ownership = "BucketOwnerPreferred" 
+  }
+}
 
 resource "aws_s3_bucket_public_access_block" "tfstate" {
   bucket                  = aws_s3_bucket.tfstate.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = true
 }
 

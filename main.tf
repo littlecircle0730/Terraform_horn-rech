@@ -5,13 +5,21 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "= 4.59.0"
+      version = ">= 5.0.0"
     }
   }
 
   # Constrain terraform version to April 2023 version when chrons were last 
   # updated until further testing can be done.
   required_version = ">= 1.1.4, < 1.4.6"
+}
+
+resource "aws_s3_bucket_ownership_controls" "horn_rech_static_controls" {
+  bucket = aws_s3_bucket.static.id
+
+  rule {
+    object_ownership = "ObjectWriter"
+  }
 }
 
 terraform {

@@ -19,9 +19,9 @@ resource "aws_s3_bucket" "logs_api_gateway" {
 
 resource "aws_s3_bucket_public_access_block" "logs_api_gateway" {
   bucket                  = aws_s3_bucket.logs_api_gateway.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = true
 }
 
@@ -47,9 +47,9 @@ resource "aws_s3_bucket" "logs_api_s3_private" {
 
 resource "aws_s3_bucket_public_access_block" "logs_api_s3_private" {
   bucket                  = aws_s3_bucket.logs_api_s3_private.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = true
 }
 

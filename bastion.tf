@@ -254,6 +254,34 @@ resource "aws_iam_policy" "bastion_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "bastion_s3_policy" {
+  name        = "bastion-s3-access"
+  description = "Allow bastion role to upload files to S3"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "s3:PutObject",
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::horn-rech-static",
+          "arn:aws:s3:::horn-rech-static/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_bastion_s3" {
+  role       = aws_iam_role.bastion_role.name
+  policy_arn = aws_iam_policy.bastion_s3_policy.arn
+}
+
 resource "aws_iam_role_policy_attachment" "bastion_policy" {
   role       = aws_iam_role.bastion_role.name
   policy_arn = aws_iam_policy.bastion_policy.arn

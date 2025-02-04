@@ -312,14 +312,13 @@ resource "aws_iam_policy" "api_lambda_policy" {
             "Action": [
                 "s3:ListBucket",
                 "s3:GetObject",
-                "s3:GetObjectAcl",
                 "s3:PutObject",
-                "s3:PutObjectAcl",
                 "s3:DeleteObject",
                 "s3:AbortMultipartUpload",
                 "s3:GetBucketLocation",
                 "s3:ListBucketMultipartUploads",
-                "s3:ListMultipartUploadParts"
+                "s3:ListMultipartUploadParts",
+                "s3:GetBucketOwnershipControls"
             ],
             "Resource": [
                 "arn:aws:s3:::${local.project_stage}-static",
@@ -389,7 +388,7 @@ resource "aws_lambda_function" "lambda" {
   filename                       = "handler/handler.zip"
   role                           = aws_iam_role.api_lambda_role.arn
   handler                        = "handler.lambda_handler"
-  runtime                        = "python3.9"
+  runtime                        = "python3.10"
   #source_code_hash               = filebase64sha256("handler/handler.zip")
   reserved_concurrent_executions = -1
   timeout                        = 900
@@ -431,7 +430,7 @@ resource "aws_lambda_function_event_invoke_config" "lambda_config" {
 
 resource "aws_s3_bucket" "code" {
   bucket = "${local.project_stage}-lambda"
-  acl    = "private"
+  #acl    = "private"
 
   #checkov:skip=CKV_AWS_18
   #checkov:skip=CKV_AWS_144
@@ -454,16 +453,24 @@ resource "aws_s3_bucket" "code" {
 
 resource "aws_s3_bucket_public_access_block" "code" {
   bucket                  = aws_s3_bucket.code.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket_public_access_block" "static" {
+  bucket                  = aws_s3_bucket.static.id
+  block_public_acls       = false  
+  ignore_public_acls      = false  
+  block_public_policy     = false
+  restrict_public_buckets = true  
+}
+
 
 resource "aws_s3_bucket" "static" {
   #checkov:skip=CKV_AWS_20:Public website content
   bucket = "${local.project_stage}-static"
-  #acl    = "public-read"
 
   #checkov:skip=CKV_AWS_144:No need to replicate
   #checkov:skip=CKV_AWS_18:Access logs not required, public resources
@@ -515,7 +522,7 @@ EOF
 
 resource "aws_s3_bucket" "private" {
   bucket = "${local.project_stage}-private"
-  acl    = "private"
+  #acl    = "private"
 
   #checkov:skip=CKV_AWS_144:No need to replicate
 
@@ -541,9 +548,9 @@ resource "aws_s3_bucket" "private" {
 
 resource "aws_s3_bucket_public_access_block" "private" {
   bucket                  = aws_s3_bucket.private.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
   restrict_public_buckets = true
 }
 
